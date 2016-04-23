@@ -1,7 +1,7 @@
 # bing-wallpaper
 拉取bing首页的背景壁纸，然后设置成mac的默认壁纸。
 
-# 使用说明
+# 热身准备
 1: 运行下面命令 
 > $> nohup ./auto.sh &
   
