@@ -3,42 +3,72 @@
 # code by phoneli
 # mail : phone.wc.li@gmail.com
 
+function fecho()
+{
+	echo "\033[33m $1$2$3$4$5 \033[0m"
+}
+
 if [ $# -ne 1 ]
 then
-	echo "usage $0 arg(bing , bing-load or dark)"
+	fecho " "
+	fecho "usage $0 arg( l | ls | bing | dark | bing-load | \$num | h )"
+	fecho " "
 	exit	
 fi
 
 cmd=$1
+localfolder="/Users/$USER/Pictures/bing"
+
 if [ "$cmd"x = "bing-load"x ]
 then
 	pass=""
-elif [ "$cmd"x = "dark"x ]
-then
-	filename="dark.png"
-	localfolder="/Users/$USER/Pictures/bing"
-	localfile=${localfolder}"/"${filename}
-	osascript -e "tell application \"Finder\" to set desktop picture to POSIX file \"$localfile\""
-	exit
-elif [ "$cmd"x = "bing"x ]
-then
-	filename=$(echo $(date +%y%m%d)".jpg")
-	localfolder="/Users/$USER/Pictures/bing"
-	localfile=${localfolder}"/"${filename}
-	osascript -e "tell application \"Finder\" to set desktop picture to POSIX file \"$localfile\""
-	exit
 else
-	echo "usage $0 arg(bing or dark)"
-	exit	
+	case $cmd in
+	"l" | "ls" )
+		tmp=1
+		ls -l $localfolder"/" | grep -v total | awk '{print $NF}' | while read line
+		do
+			echo "$line ($tmp)"
+			let "tmp = $tmp + 1"
+		done
+	;;
+	"bing" )
+		filename=$(echo $(date +%y%m%d)".jpg")
+		localfile=${localfolder}"/"${filename}
+		osascript -e "tell application \"Finder\" to set desktop picture to POSIX file \"$localfile\""
+	;;
+	"dark" )
+		filename="dark.png"
+		localfile=${localfolder}"/"${filename}
+		osascript -e "tell application \"Finder\" to set desktop picture to POSIX file \"$localfile\""
+	;;
+	[1-9] | [1-9][0-9] | [1-9][0-9][0-9] )
+		line=$cmd
+		filename=$(ls -l $localfolder"/" | grep -v total | awk '{print $NF}' | tail -n +$line | head -n 1)
+		localfile=${localfolder}"/"${filename}
+		osascript -e "tell application \"Finder\" to set desktop picture to POSIX file \"$localfile\""
+	;;
+	"h" | "-h" | "--help")
+		fecho " "
+		fecho "usage $0 arg( l | ls | bing | dark | bing-load | \$num | h )"
+		fecho "l | ls : list"
+		fecho "bing : set today bing's image"
+		fecho "dark : set dark image"
+		fecho "bing-load : load today bing's image from web and set it"
+		fecho "h : help"
+		fecho "\$num : set one image which in list"
+		fecho " "
+	;;
+	esac		
+	
+	exit
 fi
 
 #======bing logic======
  
 # get url
 url=$(curl "http://cn.bing.com/#" | grep hprichbg | grep -o "url:'http.*bing.*hprichbg.*jpg',id" | awk -F"'" '{print $2}')
-#filename=$(echo $url | awk -F"/" '{print $NF}' )
 filename=$(echo $(date +%y%m%d)".jpg")
-localfolder="/Users/$USER/Pictures/bing"
 localfile=${localfolder}"/"${filename}
 
 if [ ! -e $localfolder ]
@@ -56,11 +86,6 @@ fi
 
 #download image
 curl -o $localfile  $url
-
-#echo $url
-#echo $filename
-#echo $localfolder
-#echo $localfile
 
 #set image 
 osascript -e "tell application \"Finder\" to set desktop picture to POSIX file \"$localfile\""
