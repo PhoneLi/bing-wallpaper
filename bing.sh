@@ -26,7 +26,7 @@ else
 	case $cmd in
 	"l" | "ls" )
 		tmp=1
-		ls -l $localfolder"/" | grep -v total | awk '{print $NF}' | while read line
+		ls -l $localfolder"/" | grep -v total | awk '{print $NF}' | sort -r | while read line
 		do
 			echo "$line ($tmp)"
 			let "tmp = $tmp + 1"
@@ -44,7 +44,7 @@ else
 	;;
 	[1-9] | [1-9][0-9] | [1-9][0-9][0-9] )
 		line=$cmd
-		filename=$(ls -l $localfolder"/" | grep -v total | awk '{print $NF}' | tail -n +$line | head -n 1)
+		filename=$(ls -l $localfolder"/" | grep -v total | awk '{print $NF}' | sort -r | tail -n +$line | head -n 1)
 		localfile=${localfolder}"/"${filename}
 		osascript -e "tell application \"Finder\" to set desktop picture to POSIX file \"$localfile\""
 	;;
