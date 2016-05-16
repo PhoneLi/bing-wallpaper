@@ -67,7 +67,7 @@ fi
 #======bing logic======
  
 # get url
-url=$(curl "http://cn.bing.com/#" | grep hprichbg | grep -o "url:'http.*bing.*hprichbg.*jpg',id" | awk -F"'" '{print $2}')
+url=$(curl "http://cn.bing.com/#" | grep hprichbg | grep -o "http.*bing.*hprichbg.*jpg" | awk -F '"' '{print $1}' | sed 's@[\]@@g')
 filename=$(echo $(date +%y%m%d)".jpg")
 localfile=${localfolder}"/"${filename}
 
